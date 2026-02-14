@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiterose & Co. - Sistem Gaji</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#121212',
+                        pink: '#FF3E9D',
+                        darkpink: '#D61F73',
+                        lightpink: '#FF87B4',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark text-white min-h-screen">
+    <!-- HALAMAN LOGIN -->
+    <div id="login-page">
+        <div class="max-w-md mx-auto mt-20 p-4">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white">WHITEROSE & CO.</h1>
+                <p class="text-pink font-medium mt-2">DIGITAL MARKETING AGENCY</p>
+            </div>
+
+            <div class="border border-pink rounded-xl p-6">
+                <div id="error-msg" class="hidden bg-red-500/20 text-red-400 p-3 rounded-lg mb-4 text-center"></div>
+                
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label class="block text-lightpink mb-2">USERNAME</label>
+                        <input type="text" id="username" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-lightpink mb-2">PASSWORD</label>
+                        <input type="password" id="password" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                    <button type="submit" class="w-full bg-pink hover:bg-darkpink rounded-lg py-3 font-bold transition-colors">
+                        MASUK KE DASHBOARD
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN DASHBOARD -->
+    <div id="dashboard-page" class="hidden">
+        <!-- HEADER -->
+        <div class="bg-dark/90 border-b border-pink py-3 fixed w-full top-0 left-0 z-10">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold">WHITEROSE & CO. - DASHBOARD</h2>
+                        <p class="text-xs text-pink/80" id="user-role"></p>
+                    </div>
+                    <button id="logout-btn" class="bg-pink/20 hover:bg-pink/30 text-pink px-3 py-1 rounded-lg mt-2 md:mt-0">
+                        <i class="fa fa-sign-out mr-1"></i> KELUAR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN -->
+        <div class="container mx-auto px-4 pt-20 pb-10">
+            <!-- KONTROL ADMIN -->
+            <div id="admin-controls" class="hidden mb-6">
+                <button id="add-employee-btn" class="bg-pink hover:bg-darkpink rounded-lg px-4 py-2 font-bold transition-colors">
+                    <i class="fa fa-plus mr-1"></i> TAMBAH KARYAWAN BARU
+                </button>
+            </div>
+
+            <!-- DAFTAR KARYAWAN -->
+            <div>
+                <h3 class="text-xl font-bold text-lightpink mb-4"><i class="fa fa-users mr-2"></i>DAFTAR KARYAWAN</h3>
+                
+                <div class="border border-pink rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-pink/10">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">NAMA KARYAWAN</th>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">POSISI</th>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">OMSET BULAN INI</th>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">GAJI SAAT INI</th>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">STATUS GAJI</th>
+                                    <th class="px-4 py-3 text-left text-lightpink font-semibold">AKSI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body">
+                                <!-- DATA AKAN MUNCUL DISINI -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT -->
+    <div id="action-modal" class="hidden fixed inset-0 bg-black/80 z-20 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-dark border border-pink rounded-xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-xl font-semibold text-pink" id="modal-title"></h4>
+                <button id="close-modal" class="text-gray-400 hover:text-white">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <form id="action-form">
+                <input type="hidden" id="edit-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-lightpink mb-2">NAMA KARYAWAN</label>
+                        <input type="text" id="edit-name" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                    <div>
+                        <label class="block text-lightpink mb-2">POSISI</label>
+                        <input type="text" id="edit-position" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-lightpink mb-2">OMSET BULAN INI (Rp)</label>
+                        <input type="number" id="edit-revenue" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                    <div>
+                        <label class="block text-lightpink mb-2">GAJI SAAT INI (Rp)</label>
+                        <input type="number" id="edit-salary" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink" required>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-lightpink mb-2">STATUS GAJI</label>
+                    <select id="edit-status" class="w-full bg-dark border border-pink rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-pink">
+                        <option value="Naik">Naik</option>
+                        <option value="Tetap">Tetap</option>
+                        <option value="Turun">Turun</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button type="button" id="delete-btn" class="hidden bg-red-600 hover:bg-red-700 rounded-lg px-4 py-2 font-bold">
+                        <i class="fa fa-trash mr-1"></i> HAPUS
+                    </button>
+                    <button type="button" id="cancel-btn" class="bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 font-bold">
+                        BATAL
+                    </button>
+                    <button type="submit" class="bg-pink hover:bg-darkpink rounded-lg px-4 py-2 font-bold">
+                        SIMPAN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ======================
+        // DATA LOGIN (HANYA KAMU YANG TAU)
+        // ======================
+        // SUPER ADMIN:
+        // Username: CEOWhiterose
+        // Password: WRCo.Performance2026
+
+        // KARYAWAN CONTOH:
+        // Username: RinaW | Password: Rina1234
+        // Username: BudiS | Password: Budi1234
+        // ======================
+
+        // DATA KARYAWAN (EDIT DISINI SESUKA KAMU)
+        let employeeData = [
+            { id: 1, username: "RinaW", password: "Rina1234", role: "karyawan", name: "Rina Wijaya", position: "Senior Marketing Specialist", revenue: 350000000, salary: 18500000, status: "Naik" },
+            { id: 2, username: "BudiS", password: "Budi1234", role: "karyawan", name: "Budi Santoso", position: "Marketing Executive", revenue: 180000000, salary: 9250000, status: "Tetap" },
+            { id: 3, username: "SitiN", password: "Siti1234", role: "karyawan", name: "Siti Nurhaliza", position: "Junior Marketing Specialist", revenue: 75000000, salary: 5100000, status: "Turun" },
+        ];
+
+        // DATA SUPER ADMIN
+        const superAdmin = {
+            username: "CEOWhiterose",
+            password: "WRCo.Performance2026",
+            role: "superadmin",
+            name: "CEO Whiterose & Co."
+        };
+
+        // ELEMEN WEBSITE
+        const loginPage = document.getElementById('login-page');
+        const dashboardPage = document.getElementById('dashboard-page');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('error-msg');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userRoleText = document.getElementById('user-role');
+        const adminControls = document.getElementById('admin-controls');
+        const employeeTableBody = document.getElementById('employee-table-body');
+        const actionModal = document.getElementById('action-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const actionForm = document.getElementById('action-form');
+        const closeModal = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const addEmployeeBtn = document.getElementById('add-employee-btn');
+
+        // FORMAT UANG
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka);
+        }
+
+        // TAMPILKAN DATA KARYAWAN
+        function renderEmployees(currentUser) {
+            employeeTableBody.innerHTML = '';
+            
+            employeeData.forEach(emp => {
+                const row = document.createElement('tr');
+                row.className = 'border-t border-pink/20 hover:bg-pink/5 transition-colors';
+                
+                // WARNA STATUS
+                let statusColor = '';
+                if (emp.status === 'Naik') statusColor = 'bg-green-500/20 text-green-500';
+                if (emp.status === 'Tetap') statusColor = 'bg-yellow-500/20 text-yellow-500';
+                if (emp.status === 'Turun') statusColor = 'bg-red-500/20 text-red-500';
+
+                // TOMBOL AKSI
+                let actionButtons = '<span class="text-gray-500">Tidak bisa edit</span>';
+                if (currentUser.role === 'superadmin') {
+                    actionButtons = `
+                        <button class="edit-btn bg-pink/20 hover:bg-pink/30 text-pink px-2 py-1 rounded-lg transition-colors mr-1" data-id="${emp.id}">
+                            <i class="fa fa-pencil mr-1"></i> Edit
+                        </button>
+                        <button class="delete-btn bg-red-500/20 hover:bg-red-500/30 text-red-400 px-2 py-1 rounded-lg transition-colors" data-id="${emp.id}">
+                            <i class="fa fa-trash mr-1"></i> Hapus
+                        </button>
+                    `;
+                }
+
+                row.innerHTML = `
+                    <td class="px-4 py-3">${emp.name}</td>
+                    <td class="px-4 py-3">${emp.position}</td>
+                    <td class="px-4 py-3">${formatRupiah(emp.revenue)}</td>
+                    <td class="px-4 py-3">${formatRupiah(emp.salary)}</td>
+                    <td class="px-4 py-3"><span class="${statusColor} px-2 py-1 rounded text-sm">${emp.status}</span></td>
+                    <td class="px-4 py-3">${actionButtons}</td>
+                `;
+
+                employeeTableBody.appendChild(row);
+            });
+
+            // EVENT EDIT/HAPUS
+            if (currentUser.role === 'superadmin') {
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+                });
+            }
+        }
+
+        // MODAL EDIT
+        function openEditModal(id) {
+            const emp = employeeData.find(e => e.id === id);
+            if (emp) {
+                modalTitle.textContent = 'EDIT DATA KARYAWAN';
+                deleteBtn.classList.remove('hidden');
+                document.getElementById('edit-id').value = id;
+                document.getElementById('edit-name').value = emp.name;
+                document.getElementById('edit-position').value = emp.position;
+                document.getElementById('edit-revenue').value = emp.revenue;
+                document.getElementById('edit-salary').value = emp.salary;
+                document.getElementById('edit-status').value = emp.status;
+                actionModal.classList.remove('hidden');
+            }
+        }
+
+        // MODAL HAPUS
+        function openDeleteModal(id) {
+            const emp = employeeData.find(e => e.id === id);
+            if (emp) {
+                if (confirm(`Apakah kamu yakin ingin menghapus data ${emp.name}?`)) {
+                    employeeData = employeeData.filter(e => e.id !== id);
+                    renderEmployees(currentUser);
+                }
+            }
+        }
+
+        // MODAL TAMBAH
+        function openAddModal() {
+            modalTitle.textContent = 'TAMBAH KARYAWAN BARU';
+            deleteBtn.classList.add('hidden');
+            document.getElementById('edit-id').value = 'new';
+            document.getElementById('edit-name').value = '';
+            document.getElementById('edit-position').value = '';
+            document.getElementById('edit-revenue').value = '';
+            document.getElementById('edit-salary').value = '';
+            document.getElementById('edit-status').value = 'Tetap';
+            actionModal.classList.remove('hidden');
+        }
+
+        // SIMPAN DATA
+        actionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            if (id === 'new') {
+        // Tambah karyawan baru
+        const newId = employeeData.length > 0 ? Math.max(...employeeData.map(e => e.id)) + 1 : 1;
+        const newEmployee = {
+            id: newId,
+            username: document.getElementById('edit-name').value.replace(/\s+/g, '').toLowerCase(),
+            password: 'PasswordDefault123', // Bisa diganti sesuai keinginan
+            role: 'karyawan',
+            name: document.getElementById('edit-name').value,
+            position: document.getElementById('edit-position').value,
+            revenue: parseInt(document.getElementById('edit-revenue').value),
+            salary: parseInt(document.getElementById('edit-salary').value),
+            status: document.getElementById('edit-status').value
+        };
+        employeeData.push(newEmployee);
+    } else {
+        // Edit karyawan yang sudah ada
+        const empIndex = employeeData.findIndex(e => e.id === parseInt(id));
+        if (empIndex !== -1) {
+            employeeData[empIndex] = {
+                ...employeeData[empIndex],
+                name: document.getElementById('edit-name').value,
+                position: document.getElementById('edit-position').value,
+                revenue: parseInt(document.getElementById('edit-revenue').value),
+                salary: parseInt(document.getElementById('edit-salary').value),
+                status: document.getElementById('edit-status').value
+            };
+        }
+    }
+    actionModal.classList.add('hidden');
+    renderEmployees(currentUser);
+});
+
+// Tutup modal
+closeModal.addEventListener('click', () => actionModal.classList.add('hidden'));
+cancelBtn.addEventListener('click', () => actionModal.classList.add('hidden'));
+
+// Tambah karyawan baru
+addEmployeeBtn.addEventListener('click', openAddModal);
+
+// Logout
+logoutBtn.addEventListener('click', () => {
+    loginPage.classList.remove('hidden');
+    dashboardPage.classList.add('hidden');
+    usernameInput.value = '';
+    passwordInput.value = '';
+    errorMsg.classList.add('hidden');
+});
+
+// Login
+let currentUser = null;
+loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const inputUser = usernameInput.value;
+    const inputPass = passwordInput.value;
+
+    // Cek apakah super admin
+    if (inputUser === superAdmin.username && inputPass === superAdmin.password) {
+        currentUser = superAdmin;
+        loginSuccess();
+    } else {
+        // Cek karyawan
+        const foundEmployee = employeeData.find(emp => emp.username === inputUser && emp.password === inputPass);
+        if (foundEmployee) {
+            currentUser = foundEmployee;
+            loginSuccess();
+        } else {
+            // Tampilkan pesan error
+            errorMsg.textContent = 'Username atau Password salah!';
+            errorMsg.classList.remove('hidden');
+        }
+    }
+});
+
+function loginSuccess() {
+    loginPage.classList.add('hidden');
+    dashboardPage.classList.remove('hidden');
+    userRoleText.textContent = `Role: ${currentUser.role.toUpperCase()}`;
+    
+    // Tampilkan kontrol admin jika user adalah super admin
+    if (currentUser.role === 'superadmin') {
+        adminControls.classList.remove('hidden');
+    } else {
+        adminControls.classList.add('hidden');
+    }
+
+    renderEmployees(currentUser);
+}
+</script>
+</body>
+</html>
